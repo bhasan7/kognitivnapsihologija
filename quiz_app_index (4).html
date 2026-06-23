@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kognitivna psihologija – Kviz (50 vprašanj)</title>
+  <style>
+    *{box-sizing:border-box;font-family:system-ui,sans-serif}
+    body{margin:0;padding:2rem;background:#f4f4f7;display:flex;flex-direction:column;align-items:center}
+    h1{text-align:center;margin-bottom:1rem}
+    #quiz-card{background:#fff;border-radius:1rem;padding:2rem;max-width:900px;width:100%;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+    .question{font-size:1.15rem;margin-bottom:1rem}
+    .answers{display:flex;flex-direction:column;gap:.6rem}
+    button.answer{padding:.7rem 1rem;border:2px solid #ddd;border-radius:.5rem;background:#fafafa;cursor:pointer;transition:background .2s;text-align:left}
+    button.answer:hover{background:#eaeaea}
+    button.correct{background:#d4f9e1;border-color:#2ecc71}
+    button.wrong{background:#ffd6d6;border-color:#e74c3c}
+    #explanation{display:none;margin-top:1rem;padding:1rem;background:#eef4ff;border-left:4px solid #3b82f6;border-radius:.25rem}
+    #next-btn{margin-top:2rem;padding:.8rem 2rem;font-size:1rem}
+    #score{font-weight:bold;margin-bottom:.8rem}
+  </style>
+</head>
+<body>
+  <h1>Kviz – Kognitivna psihologija (50 vprašanj)</h1>
+  <div id="quiz-card">
+    <div id="score"></div>
+    <div id="question" class="question">Nalaganje…</div>
+    <div id="answers" class="answers"></div>
+    <div id="explanation"></div>
+    <button id="next-btn" style="display:none;">Naslednje vprašanje ▶</button>
+  </div>
+<script>
+const quizData=[
+{"q":"Katera trditev NAJBOLJE opisuje razliko med znanstveno paradigmo in znanstveno teorijo?","options":["Paradigma je vedno preverljiva z eksperimenti, teorija pa ni.","Paradigma je okvir predpostavk in pristopa, teorija pa konkretna razlaga znotraj okvira.","Paradigma je sinonim za hipotezo.","Teorija določa paradigmo, ne pa obratno."],"correct":1,"expl":"Paradigma je širši okvir; teorija je testabilna razlaga v tem okviru."},
+{"q":"Zakaj se za znanstveno paradigmo ne uporablja oznaka 'pravilna' ali 'nepravilna'?","options":["Ker je ni mogoče testirati.","Ker jo presojamo po uporabnosti pri razlagi pojmov, ne po absolutni resničnosti.","Ker so paradigme le zgodovinski artefakti.","Ker obstaja le ena paradigma."],"correct":1,"expl":"Paradigme ocenjujemo po uporabnosti."},
+{"q":"Kakšen je glavni cilj dekompozicijske analize?","options":["Identificirati osnovne funkcije in strukture sistema.","Napovedati vedenje brez razčlenitve.","Dokazati, da so procesi nepovezani.","Odpraviti potrebo po nevroznanosti."],"correct":0,"expl":"Sistem razdelimo na funkcijske in strukturne dele."},
+{"q":"Analiza kapacitet proučuje …","options":["osnovne zmožnosti sistema","fizične dele možganov","statistične metode","mrežo nevronov"],"correct":0,"expl":"Sprašuje se, kaj sistem kot celota zmore."},
+{"q":"Primer funkcijske analize v avtomobilu je …","options":["Pogonski sistem","Motor","Kolesa","Volan"],"correct":0,"expl":"Funkcija pogona, ne specifični deli."},
+{"q":"Kaj zagovarja kognitivna psihologija?","options":["Proučevati le vedenje","Povezati mentalne procese z delovanjem možganov","Ignorirati subjektivno izkušnjo","Fokusirati se le na subjektivne introspekcije"],"correct":1,"expl":"Integracija procesov in možganskih podatkov."},
+{"q":"Nevroznanost se primarno ukvarja z …","options":["mentalnimi reprezentacijami","živčno aktivnostjo","statistiko vedenja","družbenimi interakcijami"],"correct":1,"expl":"Fokus na fiziologiji možganov."},
+{"q":"Načelo 'pure insertion' predpostavlja, da dodajanje novega procesa …","options":["ne spremeni trajanja ostalih stopenj","poveča motorični odziv","skrajša zaznavo","povzroči interferenco"],"correct":0,"expl":"Procesne stopnje so neodvisne."},
+{"q":"Sternberg je pokazal, da se RT pri prepoznavanju niza …","options":["poveča linearno z velikostjo seznama","ne spremeni","poveča logaritmično","zmanjša"],"correct":0,"expl":"Serijsko iskanje."},
+{"q":"Metoda aditivnih faktorjev sklepa na ločene procese, ko se učinki dejavnikov …","options":["seštevajo","pomnožijo","izničijo","prekrivajo"],"correct":0,"expl":"Aditivnost ⇒ ločene stopnje."},
+{"q":"Metoda limita določi prag z …","options":["postopnim večanjem in nato zmanjšanjem dražljaja","naključnim predstavljanjem intenzitet","samoprilagoditvijo","uporabo dveh intenzitet"],"correct":0,"expl":"Povprečimo točke prehoda."},
+{"q":"V 4AFC je prag pri približno … pravilnih odgovorih.","options":["25 %","50 %","62,5 %","90 %"],"correct":2,"expl":"(25% + 100%)/2 = 62,5%."},
+{"q":"U-krivulja priklica kaže …","options":["učinek začetka in konca","učinek pozabljanja","interferenco","retroaktivno inhibicijo"],"correct":0,"expl":"Serijski položajni učinek."},
+{"q":"Daljši zamik med besedami izboljša priklic, ker …","options":["omogoči več subvokalnega ponavljanja","poveča interferenco","zmanjša pozornost","skrajša seznam"],"correct":0,"expl":"Več časa za elaboracijo."},
+{"q":"Magična številka 7 ± 2 velja predvsem za …","options":["verbalni kratkoročni spomin","vizualni kratkoročni spomin","semantični spomin","proceduralni spomin"],"correct":0,"expl":"Digit span."},
+{"q":"Recency učinek temelji na …","options":["kratkoročnem spominu","dolgotrajnem spominu","implicitnem spominu","senzornem spominu"],"correct":0,"expl":"Sveži elementi v KDS."},
+{"q":"Semantični spomin vsebuje …","options":["dejstva in pojme","osebne epizode","gibalne spretnosti","čustvene reflekse"],"correct":0,"expl":"Splošno znanje."},
+{"q":"Jezikovni procesi po skripti: …","options":["Govor (raz.), branje, govor (prod.), pisanje","Sluh, govor, tip, voh","Fonologija, semantika, pragmatika, sintaksa","Pisanje, branje, poslušanje"],"correct":0,"expl":"Čtirje procesi z leksikoni."},
+{"q":"Vhodni govorni leksikon omogoča …","options":["prepoznavanje fonemov in povezavo z pomenom","artikulatorno načrtovanje govora","izbor besed za pisanje","pretvorbo črk v zvoke"],"correct":0,"expl":"Razumevanje govora."},
+{"q":"Odnos med pojmi in besedami je …","options":["ne 1:1, pojem je neodvisen od besede","vedno 1:1","pojem je odvisen od jezika","besede nimajo pomena"],"correct":0,"expl":"Sopomenke dokazujejo neodvisnost."},
+{"q":"Razpršeno kodiranje v vohu pomeni, da …","options":["en vonj aktivira vzorec več receptorjev","en receptor zazna vse vonje","vsi receptorji so specifični za en vonj","vonj se kodira kontinuirano"],"correct":0,"expl":"Vzorci aktivacije."},
+{"q":"Zaznavanje barv vs. vonjev: svetloba daje … odziv, vonj pa …","options":["kontinuiran / vse-ali-nič","vse-ali-nič / kontinuiran","binaren / binaren","kontinuiran / kontinuiran"],"correct":0,"expl":"Vid – kontinuiran; vonj – diskreten."},
+{"q":"Skripta navaja … osnovnih okusov.","options":["4","5","6","3"],"correct":1,"expl":"Sladko, slano, kislo, grenko, umami."},
+{"q":"Umami sproži prisotnost …","options":["glutamata","fruktoze","natrija","alkaloidov"],"correct":0,"expl":"Glutaminska kislina."},
+{"q":"Podobne molekule vonja aktivirajo v bulbus olfactorius … področja.","options":["bližnja","naključna","vsa","distalna"],"correct":0,"expl":"Prostorska topografija."},
+{"q":"Metoda konstantnega dražljaja uporablja …","options":["naključni vrstni red intenzitet","postopno stopnjevanje","samoprilagoditev","le dva dražljaja"],"correct":0,"expl":"Izrišemo psihometrično funkcijo."},
+{"q":"Forced choice zmanjšuje …","options":["subjektivni kriterij","natančnost","objektivnost","potrebo po analizi"],"correct":0,"expl":"Večja objektivnost merjenja."},
+{"q":"Baddeley & Hitch prvotno predlagata … komponente delovnega spomina.","options":["3","2","4","5"],"correct":0,"expl":"Fonološka zanka, vizualno-prostorska skicirka, centralni izvršitelj."},
+{"q":"Fonološka zanka se deli na …","options":["fonološko shrambo in subvokalni ponavljalnik","vizualno shrambo in skicirko","izvršilni sklad in nadzorni sistem","episodični buffer in zvočni modul"],"correct":0,"expl":"Shramba + artikulacijska zanka."},
+{"q":"Episodični buffer (Baddeley 2000) povezuje …","options":["informacije iz različnih modalnosti","le vidne informacije","samo zvok","motorni izhod"],"correct":0,"expl":"Veže multimodalne informacije."},
+{"q":"Obliko U-krivulje lahko pojasnimo z …","options":["kombinacijo KDS in DTS","samo dolgoročnim spominom","le senzornim spominom","retroaktivno inhibicijo"],"correct":0,"expl":"Prvi elementi → LTS, zadnji → KDS."},
+{"q":"V modelu Atkinson & Shiffrin informacije preidejo v LTS preko …","options":["ponavljanja","senzornega spomina","proceduralnih poti","implicitne kodiranja"],"correct":0,"expl":"Rehearsal."},
+{"q":"Pri pasivnem učenju (\\\"mere exposure\\\") je pomembna komponenta …","options":["prepoznavanje","eksplicitni priklic","motorika","anksioznost"],"correct":0,"expl":"Familiarity efekt."},
+{"q":"Proceduralni spomin je večinoma …","options":["impliciten","ekspliciten","deklarativen","epizodičen"],"correct":0,"expl":"Veščine in navade."},
+{"q":"Katera tehnika meri cerebralni pretok krvi?","options":["fMRI","EEG","TMS","MEG"],"correct":0,"expl":"fMRI meri spremembe BOLD."},
+{"q":"EEG ima … časovno ločljivost in … prostorsko ločljivost.","options":["visoko / nizko","nizko / visoko","visoko / visoko","nizko / nizko"],"correct":0,"expl":"ms natančno, cm prostorsko."},
+{"q":"Double dissociation v nevropsihologiji pomeni …","options":["dve pacientni skupini s recipročno prizadetostjo funkcij","eno funkcijo pri dveh skupinah","en simptom pri več lezijah","nič od navedenega"],"correct":0,"expl":"Kritični dokaz za ločeni proces."},
+{"q":"Eksperimenti s pozno selekcijo pozornosti kažejo, da …","options":["semantična obdelava poteka tudi za nepozorne dražljaje","nepozorni dražljaji so prezrti na vseh stopnjah","pozornost ni omejena","perceptualna zmogljivost je neskončna"],"correct":0,"expl":"Pomen se obdela, a filtre odločajo o zavedanju."},
+{"q":"Stroopov efekt kaže na konflikt med …","options":["avtomatsko in kontrolirano obdelavo","senzornim in motoričnim sistemom","vidom in sluhom","kratkoročnim in dolgotrajnim spominom"],"correct":0,"expl":"Branje besede je avtomatsko."},
+{"q":"Izvedba dveh nalog hkrati omogoča merjenje …","options":["centralne ozkogrla","vizualne ostrine","kapacitete LTS","ikoničnega spomina"],"correct":0,"expl":"Dual-task paradigme.«"},
+{"q":"Izbira strategije reševanja problemov (algoritem vs. heuristika) je primer …","options":["metakognitivnega nadzora","proceduralnega učenja","implicitnega spomina","senzornega kodiranja"],"correct":0,"expl":"Nadzor nad kognitivnimi procesi."},
+{"q":"Kategorijsko sklepanje vključuje …","options":["deduktivno logiko","verjetnostno sklepanje","metaforično razmišljanje","implicitno učenje"],"correct":0,"expl":"Syllogisms, ipd."},
+{"q":"Pri odločitveni pristranskosti 'ankering' ljudje …","options":["se preveč zanašajo na prvo informacijo","ignorirajo verjetnosti","pretirajo z izgubo","vrednotijo izbire z vidika dobička"],"correct":0,"expl":"Sidro vpliva na oceno."},
+{"q":"Somatski marker hipoteza (Damasio) poudarja vlogo … pri odločanju.","options":["čustvenih signalov","logične analize","jezikovnih struktur","implicitnega spomina"],"correct":0,"expl":"Telesni občutki vodijo izbiro."},
+{"q":"Centralni izvršitelj v delovnem spominu …","options":["usmerja pozornost in koordinira podsisteme","shranjuje fonološke informacije","kodira vizualne slike","generira govor"],"correct":0,"expl":"Nadzorni mehanizem."},
+{"q":"Kakšen vpliv ima čustvena vzburjenost na spomin?","options":["lahko krepi kodiranje dogodka","vedno zmanjšuje priklic","nima vpliva","onemogoči konsolidacijo"],"correct":0,"expl":"Modularni učinek – amigdala."},
+{"q":"Teorija dvojne poti (LeDoux) predlaga …","options":["hitro subkortikalno in počasno kortikalno pot čustvene obdelave","samo eno pot preko amigdale","izključno kortikalni nadzor","da emocije niso povezane z možgani"],"correct":0,"expl":"Low road & high road."},
+{"q":"Kognitivni nadzor vključuje …","options":["inhibicijo, fleksibilnost, posodabljanje","proceduralni spomin","senzorno kodiranje","implicitne reflekse"],"correct":0,"expl":"Executive functions."},
+{"q":"Model signalne detekcije loči …","options":["sensitivnost (d') in kriterij (β)","epizodični in semantični spomin","vidni in slušni kanal","hitro in počasno pozornost"],"correct":0,"expl":"d' & kriterij."},
+{"q":"Eksperiment s pandžami in puhlicami (Shepard & Metzler) kaže …","options":["mentalno rotacijo","proceduralno učenje","slabost ikoničnega spomina","magično število"],"correct":0,"expl":"RT ~ kot rotacije."}
+];
+
+// ====== Logika kviza ======
+let current=0,score=0,wrong=[];
+const qEl=document.getElementById('question');
+const ansEl=document.getElementById('answers');
+const expEl=document.getElementById('explanation');
+const nextBtn=document.getElementById('next-btn');
+const scoreEl=document.getElementById('score');
+
+function loadQuestion(){
+  const item=quizData[current];
+  qEl.textContent=`(${current+1}/${quizData.length}) `+item.q;
+  ansEl.innerHTML='';
+  expEl.style.display='none';
+  nextBtn.style.display='none';
+  item.options.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='answer';
+    b.textContent=String.fromCharCode(65+i)+') '+opt;
+    b.onclick=()=>selectAnswer(b,i);
+    ansEl.appendChild(b);
+  });
+  updateScore();
+}
+
+function selectAnswer(btn,idx){
+  const item=quizData[current];
+  document.querySelectorAll('button.answer').forEach(b=>b.disabled=true);
+  if(idx===item.correct){btn.classList.add('correct');score++;}
+  else{btn.classList.add('wrong');document.querySelectorAll('button.answer')[item.correct].classList.add('correct');wrong.push(item);}
+  expEl.textContent='Razlaga: '+item.expl;expEl.style.display='block';
+  nextBtn.style.display='inline-block';
+}
+
+nextBtn.onclick=()=>{current++;current<quizData.length?loadQuestion():showResult();};
+
+function showResult(){
+  qEl.textContent=`Konec kviza! Dosegel si ${score}/${quizData.length} točk.`;
+  ansEl.innerHTML='';
+  expEl.style.display='none';
+  nextBtn.style.display='none';
+  if(wrong.length){
+    const r=document.createElement('button');
+    r.textContent='Ponovi napačna ('+wrong.length+')';
+    r.onclick=()=>{quizData.length=0;wrong.forEach(q=>quizData.push(q));current=0;score=0;wrong=[];loadQuestion();};
+    ansEl.appendChild(r);
+  }
+}
+
+function updateScore(){scoreEl.textContent='Točke: '+score;}
+loadQuestion();
+</script>
+</body>
+</html>
